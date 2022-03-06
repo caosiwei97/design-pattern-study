@@ -1,8 +1,10 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
+const smp = new SpeedMeasurePlugin()
 
-module.exports = {
-  mode: 'development',
+module.exports = smp.wrap({
+  mode: 'none',
   entry: './src/index.js',
   devtool: 'cheap-module-source-map',
   output: {
@@ -34,4 +36,4 @@ module.exports = {
       template: './src/index.html',
     }),
   ],
-}
+})
