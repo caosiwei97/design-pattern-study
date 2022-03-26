@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div
+      id="ball"
+      style="
+        position: absolute;
+        background: #000;
+        width: 50px;
+        height: 50px;
+        top: 100px;
+      "
+    ></div>
+    <div>
+      输入小球移动后的位置:<input id="pos" />
+      <button id="moveBtn">开始移动</button>
+      <button id="cancelBtn">撤销</button>
+    </div>
+  </body>
+
+  <script type="module">
+    import Animate from '../ball-animate.js'
+
+    const ball = document.getElementById('ball')
+    const pos = document.getElementById('pos')
+    const moveBtn = document.getElementById('moveBtn')
+    const cancelBtn = document.getElementById('cancelBtn')
+
+    const MoveCommand = function (receiver) {
+      let oldPos = null
+
+      return function (pos) {
+        return {
+          execute() {
+            receiver.start('left', pos, 1000, 'easeIn')
+            oldPos = receiver.dom.getBoundingClientRect()[receiver.propertyName]
+          },
+
+          undo() {
+            console.log(oldPos)
+            oldPos && receiver.start('left', oldPos, 1000, 'easeIn')
+          },
+        }
+      }
+    }
+
+    let moveCommand = MoveCommand(new Animate(ball))
+
+    moveBtn.onclick = function () {
+      moveCommand(200).execute()
+    }
+
+    cancelBtn.onclick = function () {
+      moveCommand().undo()
+    }
+  </script>
+</html>

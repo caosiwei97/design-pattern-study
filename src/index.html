@@ -4,14 +4,119 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>design-pattern</title>
+    <title>design-pattern-rule</title>
   </head>
   <body>
-    <form action="" method="post" id="registerForm">
-      请输入用户名:<input type="text" name="userName"/ > 请输入密码:<input
-      type="text" name="password"/ > 请输入手机号码:<input type="text"
-      name="phoneNumber"/ >
-      <button>提交</button>
+    <form action="/register" method="post" id="registerForm">
+      <div class="form-item">
+        请输入用户名:<input type="text" name="userName"/ >
+      </div>
+
+      <div class="form-item">
+        请输入密码:<input type="password" name="password"/ >
+      </div>
+
+      <div class="form-item">
+        请输入手机号码:<input type="text" name="phoneNumber"/ >
+      </div>
+      <button type="submit">提交</button>
     </form>
+
+    <script>
+      const rules = {
+        isNonEmpty: function (value, errorMsg) {
+          if (value === '') {
+            return errorMsg
+          }
+        },
+        minLength: function (value, errorMsg, length) {
+          if (value.length < length) {
+            return errorMsg
+          }
+        },
+        isMobile: function (value, errorMsg) {
+          if (!/(^1[3|5|8][0-9]{9}$)/.test(value)) {
+            return errorMsg
+          }
+        },
+      }
+
+      class Validator {
+        constructor() {
+          this.cache = []
+        }
+
+        add(formItem, rules, errorMsg) {
+          rules.forEach(({ rule, errorMsg }) => {
+            // 获取参数
+            const params = rule.split(':')
+
+            // 将校验函数存入缓存
+            this.cache.push(function () {
+              // 校验规则
+              const rule = params.shift()
+              // 校验的值
+              params.unshift(formItem.value)
+              // message
+              params.push(errorMsg)
+              return rules[rule].apply(formItem, params)
+            })
+          })
+        }
+
+        validate(cb) {
+          for (const fn of this.cache) {
+            const errorMsg = fn()
+
+            if (errorMsg) {
+              return errorMsg
+            }
+          }
+        }
+      }
+
+      const validatorFn = (registerForm) => {
+        const validator = new Validator()
+
+        validator.add(registerForm.userName, [
+          {
+            rule: 'isNonEmpty',
+            errorMsg: '用户名不能为空',
+          },
+          {
+            rule: 'minLength:6',
+            errorMsg: '用户名长度不能小于 10 位',
+          },
+        ])
+
+        validator.add(registerForm.password, [
+          {
+            rule: 'minLength:6',
+            errorMsg: '密码长度不能小于 6 位',
+          },
+        ])
+
+        validator.add(registerForm.phoneNumber, [
+          {
+            rule: 'isMobile',
+            errorMsg: '手机号码格式不正确',
+          },
+        ])
+
+        const errorMsg = validator.validate()
+
+        if (errorMsg) {
+          console.log(errorMsg)
+          return false
+        }
+      }
+
+      const registerForm = document.getElementById('registerForm')
+
+      registerForm.onsubmit = function (e) {
+        const isValid = validatorFn(this)
+        if (!isValid) e.preventDefault()
+      }
+    </script>
   </body>
 </html>
