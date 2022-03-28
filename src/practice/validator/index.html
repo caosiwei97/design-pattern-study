@@ -22,60 +22,8 @@
       <button>提交</button>
     </form>
 
-    <script>
-      const rules = {
-        isNonEmpty: function (value, errorMsg) {
-          if (value === '') {
-            return errorMsg
-          }
-        },
-        minLength: function (value, errorMsg, length) {
-          if (value.length < length) {
-            return errorMsg
-          }
-        },
-        isMobile: function (value, errorMsg) {
-          if (!/(^1[3|5|8][0-9]{9}$)/.test(value)) {
-            return errorMsg
-          }
-        },
-      }
-
-      class Validator {
-        constructor() {
-          this.cache = []
-        }
-
-        // 添加规则
-        add(formItem, ruleConfig) {
-          ruleConfig.forEach(({ rule, errorMsg }) => {
-            // 获取参数
-            const params = rule.split(':')
-
-            // 将校验函数存入缓存
-            this.cache.push(function () {
-              // 校验规则
-              const _rule = params.shift()
-              console.log(_rule)
-              // 校验的值
-              params.unshift(formItem.value)
-              // message
-              params.push(errorMsg)
-              return rules[_rule].apply(formItem, params)
-            })
-          })
-        }
-
-        validate(cb) {
-          for (const fn of this.cache) {
-            const errorMsg = fn()
-
-            if (errorMsg) {
-              return errorMsg
-            }
-          }
-        }
-      }
+    <script type="module">
+      import Validator from './validator.js'
 
       const validatorFn = (registerForm) => {
         const validator = new Validator()
