@@ -8,12 +8,6 @@ const strategies = {
   B(salary) {
     return salary * 3
   },
-  Q(salary) {
-    return salary * 3
-  },
-  E(salary) {
-    return salary * 3
-  },
 }
 
 /**

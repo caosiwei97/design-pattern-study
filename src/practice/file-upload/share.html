@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // 只维护一个 uploadType 内部状态
+      function Upload(uploadType) {
+        this.uploadType = uploadType
+      }
+
+      Upload.prototype.delFile = function (id) {
+        // 设置内部状态
+        uploadManager.setExternalState(id, this)
+
+        if (this.fileSize < 3000) {
+          return this.dom.parentNode.removeChild(this.dom)
+        }
+
+        if (window.confirm('确定要删除该文件吗? ' + this.fileName)) {
+          return this.dom.parentNode.removeChild(this.dom)
+        }
+      }
+
+      const UploadFactory = function () {
+        const createFlyWeightObjs = {}
+
+        return {
+          create(uploadType) {
+            if (createFlyWeightObjs[uploadType]) {
+              return createFlyWeightObjs[uploadType]
+            }
+            return (createFlyWeightObjs[uploadType] = new Upload(uploadType))
+          },
+        }
+      }
+    </script>
+  </body>
+</html>

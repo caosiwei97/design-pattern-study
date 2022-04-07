@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let id = 0
+
+      window.startUpload = function (uploadType, files) {
+        files.forEach(({ fileName, fileSize }) => {
+          const fileObj = new Upload(uploadType, fileName, fileSize)
+          fileObj.init(id++)
+        })
+      }
+
+      function Upload(uploadType, fileName, fileSize) {
+        this.uploadType = uploadType
+        this.fileName = fileName
+        this.fileSize = fileSize
+        this.dom = null
+      }
+
+      Upload.prototype.init = function (id) {
+        const that = this
+        this.id = id
+        this.dom = document.createElement('div')
+        this.dom.innerHTML = `
+          <span>文件名称: ${this.fileName}, 文件大小: ${this.fileSize}</span>
+          <button class="delFile">删除</button>';
+        `
+        this.dom.querySelector('.delFile').onclick = function () {
+          that.delFile()
+        }
+        document.body.appendChild(this.dom)
+      }
+
+      Upload.prototype.delFile = function () {
+        if (this.fileSize < 3000) {
+          return this.dom.parentNode.removeChild(this.dom)
+        }
+        if (window.confirm('确定要删除该文件吗? ' + this.fileName)) {
+          return this.dom.parentNode.removeChild(this.dom)
+        }
+      }
+
+      startUpload('plugin', [
+        {
+          fileName: '1.txt',
+          fileSize: 1000,
+        },
+        {
+          fileName: '2.txt',
+          fileSize: 3000,
+        },
+        {
+          fileName: '3.txt',
+          fileSize: 5000,
+        },
+      ])
+      startUpload('flash', [
+        {
+          fileName: '4.txt',
+          fileSize: 1000,
+        },
+        {
+          fileName: '5.txt',
+          fileSize: 3000,
+        },
+        {
+          fileName: '6.txt',
+          fileSize: 5000,
+        },
+      ])
+    </script>
+  </body>
+</html>
